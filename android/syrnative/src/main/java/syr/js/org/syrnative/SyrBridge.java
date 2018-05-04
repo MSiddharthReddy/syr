@@ -185,10 +185,10 @@ public class SyrBridge {
         }
 
     }
-    public void sendEvent(HashMap<String, String> event) {
+    public void sendEvent(JSONObject event) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-            JSONObject message = new JSONObject(event);
-            sendImmediate(message);
+//            JSONObject message = new JSONObject(event);
+            sendImmediate(event);
         }
     }
 

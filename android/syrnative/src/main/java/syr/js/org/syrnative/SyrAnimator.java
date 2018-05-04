@@ -49,11 +49,15 @@ public class SyrAnimator {
 
             @Override
             public void onAnimationEnd(final Animator animation) {
-                    HashMap<String, String> eventMap = new HashMap<>();
+                try {
+                    JSONObject eventMap = new JSONObject();
                     eventMap.put("type", "animationComplete");
                     eventMap.put("animation", jsonAnimation.toString());
                     eventMap.put("guid", guid);
                     bridge.sendEvent(eventMap);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
             }
 
             @Override
@@ -214,11 +218,15 @@ public class SyrAnimator {
                         bridge.mRaster.uiHandler.post(new Runnable() {
                             @Override
                             public void run() {
-                                HashMap<String, String> eventMap = new HashMap<>();
-                                eventMap.put("type", "animationComplete");
-                                eventMap.put("animation", jsonAnimation.toString());
-                                eventMap.put("guid", guid);
-                                bridge.sendEvent(eventMap);
+                                try {
+                                    JSONObject eventMap = new JSONObject();
+                                    eventMap.put("type", "animationComplete");
+                                    eventMap.put("animation", jsonAnimation.toString());
+                                    eventMap.put("guid", guid);
+                                    bridge.sendEvent(eventMap);
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
+                                }
                             }
                         });
                     }
@@ -260,11 +268,15 @@ public class SyrAnimator {
                         bridge.mRaster.uiHandler.post(new Runnable() {
                             @Override
                             public void run() {
-                                HashMap<String, String> eventMap = new HashMap<>();
-                                eventMap.put("type", "animationComplete");
-                                eventMap.put("animation", jsonAnimation.toString());
-                                eventMap.put("guid", guid);
-                                bridge.sendEvent(eventMap);
+                                try {
+                                    JSONObject eventMap = new JSONObject();
+                                    eventMap.put("type", "animationComplete");
+                                    eventMap.put("animation", jsonAnimation.toString());
+                                    eventMap.put("guid", guid);
+                                    bridge.sendEvent(eventMap);
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
+                                }
                             }
                         });
                     }
