@@ -13,7 +13,7 @@ import java.util.HashMap;
  * Created by dereanderson on 1/10/18.
  */
 
-public class SyrTouchableOpacity implements SyrBaseModule {
+public class SyrTouchableOpacity extends SyrBaseModule {
 
     @Override
     public View render(JSONObject component, Context context, View instance) {

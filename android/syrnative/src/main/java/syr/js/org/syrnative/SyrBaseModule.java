@@ -9,7 +9,12 @@ import org.json.JSONObject;
  * Created by dereanderson on 1/9/18.
  */
 
-public interface SyrBaseModule {
-    String getName();
-    View render(JSONObject component, Context context, View instance);
+public class SyrBaseModule {
+    public String getName() {
+        return null;
+    }
+
+    public View render(JSONObject component, Context context, View instance) {
+        return null;
+    }
 }

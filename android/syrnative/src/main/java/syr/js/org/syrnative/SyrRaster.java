@@ -18,6 +18,7 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -52,6 +53,10 @@ public class SyrRaster {
 
         // main thread looper for UI updates
         uiHandler = new Handler(Looper.getMainLooper());
+    }
+
+    public SyrRootView getRootView() {
+        return mRootview;
     }
 
     /** Sets the native modules that will be used in this Context */
@@ -118,11 +123,15 @@ public class SyrRaster {
                 try {
                     final JSONObject ast = new JSONObject(jsonObject.getString("ast"));
                     Boolean Update = ast.has("update");
-//                    Log.i("update", isUpdate.toString());
                     if(ast.has("update")) {
                         Boolean isUpdate = ast.getBoolean("update");
                         if(isUpdate) {
                            update(ast);
+                            Iterator<?> keys = ast.keys();
+                            while( keys.hasNext() ) {
+                                String key = (String)keys.next();
+                                Log.i("key", key);
+                            }
                         } else {
                             buildInstanceTree(ast);
                         }
@@ -140,26 +149,151 @@ public class SyrRaster {
         syncState(ast, null);
     }
 
-    public void syncState(final JSONObject component, final ViewGroup viewParent) {
-//        try {
-//            Log.i("Updating", component.getString("uuid"));
-//            final String uuid = component.getString("uuid");
-//            Object componentInstance = mModuleInstances.get(uuid);
-//            String className = registeredModules.get(component.getString("elementName"));
-//
-//            Boolean unmount = component.getBoolean("unmount");
-//            if(unmount == true) {
-//                if(componentInstance != null) {
-//                    RelativeLayout instance = (RelativeLayout) componentInstance;
-//                    mModuleInstances.remove(uuid);
-//
-//                }
-//            }
-//
-//        } catch (JSONException e) {
-//            e.printStackTrace();
-//        }
+    public void syncState(final JSONObject component, ViewGroup viewParent) {
+        try {
+            Log.i("Updating", component.toString());
+
+            final String uuid = component.getString("uuid");
+            Object componentInstance = mModuleInstances.get(uuid);
+            String className = null;
+            if(component.has("elementName")) {
+                className = registeredModules.get(component.getString("elementName"));
+            } else {
+//                syncChildren(component, viewParent);
+                syncState(component.getJSONArray("children").getJSONObject(0), viewParent);
+            }
+
+
+            final SyrBaseModule componentModule = (SyrBaseModule) mModuleMap.get(className);
+
+
+            Boolean unmount = null;
+            if(component.has("unmount")) {
+                unmount = component.getBoolean("unmount");
+            }
+
+            if(unmount != null && unmount == true) {
+                if(componentInstance != null) {
+                    final View instance = (View) componentInstance;
+                    mModuleInstances.remove(uuid);
+                    uiHandler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            if (instance.getParent() != null) {
+                                ViewGroup parent = (ViewGroup) instance.getParent();
+                                parent.removeView(instance);
+                                emitComponentDidMount(uuid);
+                            }
+                        }
+                    });
+
+                } else {
+                    JSONArray children = component.getJSONArray("children");
+                    if(children != null) {
+                        for (int i = 0; i < children.length(); i++) {
+                            JSONObject child = children.getJSONObject(i);
+                            final String childuuid = child.getJSONObject("instance").getString("uuid");
+                            final View childInstance = (View) mModuleInstances.get(childuuid);
+                            Boolean unmountChildInstance = component.getBoolean("unmount");
+                            if(unmountChildInstance == true) {
+                                mModuleInstances.remove(childuuid);
+                                //checking if the parent is a stackView
+                                if (viewParent instanceof LinearLayout) {
+                                    //stackView stuff
+                                    Log.i("StackView", "StackView Removal/Update");
+                                } else {
+                                    uiHandler.post(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            if (childInstance.getParent() != null) {
+                                                ViewGroup parent = (ViewGroup) childInstance.getParent();
+                                                parent.removeView(childInstance);
+                                            }
+                                        }
+                                    });
+                                }
+                                emitComponentDidMount(uuid);
+                            }
+
+                        }
+                    }
+                }
+            } else {
+                if (componentInstance != null && componentModule != null) {
+                    final ViewGroup vParent = (ViewGroup) componentInstance;
+                    final View builtComponent = createComponent(component);
+                    viewParent = vParent;
+                    uiHandler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            if (builtComponent.getParent() != null) {
+                                ViewGroup parent = (ViewGroup) builtComponent.getParent();
+                                parent.removeView(builtComponent);
+                            }
+
+                            vParent.addView(builtComponent);
+                            emitComponentDidMount(uuid);
+                        }
+                    });
+
+                } else if(componentInstance == null && componentModule != null) {
+                    final View newComponent = createComponent(component);
+                    if (viewParent instanceof LinearLayout) {
+                        //@TODO handling for stackView: check if this solution works.
+                        newComponent.setLayoutParams(params);
+                    }
+                    final ViewGroup vParent = viewParent;
+                        uiHandler.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                if (newComponent.getParent() != null) {
+                                    ViewGroup parent = (ViewGroup) newComponent.getParent();
+                                    parent.removeView(newComponent);
+                                }
+
+                                vParent.addView(newComponent);
+                                emitComponentDidMount(uuid);
+                            }
+                        });
+                    viewParent = (ViewGroup) newComponent;
+                }
+
+                syncChildren(component, viewParent);
+
+            }
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
     }
+
+    public void  syncChildren(final JSONObject component, final ViewGroup viewParent) {
+
+        try {
+            JSONArray children = component.getJSONArray("children");
+            if(children != null) {
+                String key = null;
+                if(component.getJSONObject("attributes") != null) {
+                    JSONObject attributes = component.getJSONObject("attributes");
+                    if(attributes.getString("key") != null) {
+                        key = attributes.getString("key");
+                    }
+                }
+
+                for (int i = 0; i < children.length(); i++) {
+                    JSONObject child = children.getJSONObject(i);
+                    if(key != null) {
+                        child.put("key", key);
+                    }
+                    syncState(child, viewParent);
+                }
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
+
+
     /** parse the AST sent from the Syr Bridge */
     public void buildInstanceTree(final JSONObject jsonObject) {
         try {
@@ -239,6 +373,15 @@ public class SyrRaster {
         // send event for componentDidMount
         HashMap<String, String> eventMap = new HashMap<>();
         eventMap.put("type", "componentDidMount");
+        eventMap.put("guid", guid);
+        mBridge.sendEvent(eventMap);
+    }
+
+    public void emitComponentDidUnMount(String guid) {
+
+        // send event for componentDidMount
+        HashMap<String, String> eventMap = new HashMap<>();
+        eventMap.put("type", "componentDidUnMount");
         eventMap.put("guid", guid);
         mBridge.sendEvent(eventMap);
     }

@@ -76,12 +76,15 @@ public class SyrBridge {
         webViewHandler = new Handler(thread.getLooper());
 
         final SyrBridge self = this;
+        final SyrRootView rootView = mRaster.getRootView();
+        final String uriStringBootupProps = rootView.getAppProperties().toString();
         uiHandler.post(new Runnable() {
             @SuppressLint("JavascriptInterface")
             @Override
             public void run() {
                 mBridgedBrowser = new WebView(mContext);
                 mBridgedBrowser.addJavascriptInterface(self, "SyrBridge");
+
 
                 // if the url is changes from it's initial loadURL then cancel
                 // android 19 loadUrl("javascript:;");
@@ -111,7 +114,8 @@ public class SyrBridge {
                 }
 
                 String screenDensity = Float.toString(mContext.getResources().getDisplayMetrics().density);
-                String loadURL = String.format("http://10.0.2.2:8080?window_height=%s&window_width=%s&screen_density=%s&platform=android&platform_version=%s&exported_methods=%s",
+                String loadURL = String.format("http://10.0.2.2:8080?initial_props=%s&window_height=%s&window_width=%s&screen_density=%s&platform=android&platform_version=%s&exported_methods=%s",
+                        uriStringBootupProps,
                         bootParams.get("height"),
                         bootParams.get("width"),
                         screenDensity,

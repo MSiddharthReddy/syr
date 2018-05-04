@@ -15,7 +15,7 @@ import java.util.HashMap;
  * Created by dereanderson on 1/9/18.
  */
 
-public class SyrButton implements SyrBaseModule {
+public class SyrButton extends SyrBaseModule {
 
     @Override
     public View render(JSONObject component, Context context, View instance) {

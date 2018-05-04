@@ -9,6 +9,7 @@ import android.os.Handler;
 import android.os.Looper;
 import android.view.View;
 import android.view.animation.AccelerateDecelerateInterpolator;
+import android.view.animation.AccelerateInterpolator;
 import android.view.animation.LinearInterpolator;
 
 import org.json.JSONException;
