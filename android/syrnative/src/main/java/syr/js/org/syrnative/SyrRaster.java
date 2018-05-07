@@ -458,7 +458,7 @@ public class SyrRaster {
             try {
                 uuid = child.getString("uuid");
                 className = child.getString("elementName");
-                final SyrBaseModule componentModule = (SyrBaseModule) mModuleMap.get(className);
+                final SyrComponent componentModule = (SyrComponent) mModuleMap.get(className);
 
                 if (componentModule == null) {
                     return null;
