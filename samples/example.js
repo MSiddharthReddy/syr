@@ -118,16 +118,10 @@ class MyComponent extends Component {
   render() {
     return (
       <Animated.View style={styles.stage}>
-        <Text style={styles.text}>{this.state.message}</Text>
+        <Text style={styles.text}>Welcome to SYR!!</Text>
         {/* <InnerComponent/> */}
         <Animated.Image source={{ uri: 'piggy' }} style={styles.image} />
-        <Button
-          enabled={this.state.buttonEnabled}
-          onPress={() => this.onPress()}
-          style={styles.button}
-        >
-          {this.state.buttonMessage}
-        </Button>
+
       </Animated.View>
     );
   }
@@ -148,9 +142,6 @@ class MyComponent extends Component {
       toValue: 360,
       duration: 2000,
     }).start(() => {
-      this.setState({
-        message: 'Spinning Image: ' + this.spin,
-      });
       this.spinPiggy();
     });
   }

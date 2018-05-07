@@ -1,1 +1,1 @@
-include ':app', ':syrnative'
+include ':app', ':syrnative', ':authcore', ':appauth'

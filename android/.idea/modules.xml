@@ -4,6 +4,8 @@
     <modules>
       <module fileurl="file://$PROJECT_DIR$/android.iml" filepath="$PROJECT_DIR$/android.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/appauth/appauth.iml" filepath="$PROJECT_DIR$/appauth/appauth.iml" />
+      <module fileurl="file://$PROJECT_DIR$/authcore/authcore.iml" filepath="$PROJECT_DIR$/authcore/authcore.iml" />
       <module fileurl="file://$PROJECT_DIR$/syrnative/syrnative.iml" filepath="$PROJECT_DIR$/syrnative/syrnative.iml" />
     </modules>
   </component>
