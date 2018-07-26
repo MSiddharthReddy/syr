@@ -7,11 +7,12 @@ import android.text.TextUtils;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.View;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.math.BigDecimal;
 
 /**
  * Created by dereanderson on 1/9/18.
@@ -40,15 +41,16 @@ public class SyrText implements SyrBaseModule, SyrComponent {
                 style = jsonInstance.getJSONObject("style");
 
                 if (style.has("left")) {
-                    textView.setX(style.getInt("left"));
+                    textView.setX(BigDecimal.valueOf(style.getDouble("left")).floatValue());
                 }
 
                 if (style.has("top")) {
-                    textView.setY(style.getInt("top"));
+                    textView.setY(BigDecimal.valueOf(style.getDouble("top")).floatValue());
                 }
 
                 if (instance == null) {
                     textView.setLayoutParams(SyrStyler.styleLayout(style));
+
                 } else {
 
                     if (style.has("width")) {
@@ -95,6 +97,10 @@ public class SyrText implements SyrBaseModule, SyrComponent {
                 }
             }
 
+            //@TODO check with this. Looks like a default behaviour in iOS
+
+            textView.setGravity(Gravity.CENTER_VERTICAL);
+
             if (style.has("maxLines")) {
                 textView.setLines(style.getInt("maxLines"));
             } else {
@@ -104,15 +110,13 @@ public class SyrText implements SyrBaseModule, SyrComponent {
             }
 
             value = jsonInstance.getString("value");
-            textView.setText(value);
+            if (textView.getText().toString() != value) {
+                textView.setText(value);
+            }
 
         } catch (JSONException e) {
             e.printStackTrace();
         }
-
-        //truncating the textView, so the it does not break the content
-//        textView.setEllipsize(TextUtils.TruncateAt.END);
-//        textView.setSingleLine(true);
 
 
         return textView;

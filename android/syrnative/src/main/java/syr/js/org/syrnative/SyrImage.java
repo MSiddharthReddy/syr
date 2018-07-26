@@ -4,13 +4,14 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
-import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffXfermode;
 import android.graphics.Rect;
 import android.graphics.RectF;
 import android.os.AsyncTask;
+import android.os.Handler;
+import android.os.Looper;
 import android.view.View;
 import android.widget.ImageView;
 
@@ -18,6 +19,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.InputStream;
+import java.math.BigDecimal;
 
 /**
  * Created by dereanderson on 1/10/18.
@@ -34,11 +36,8 @@ public class SyrImage implements SyrBaseModule, SyrComponent {
         } else {
             imageView = new ImageView(context);
         }
-        String value = "";
         JSONObject style = null;
         JSONObject source = null;
-        Integer left = 0;
-        Integer top = 0;
 
         try {
             JSONObject jsonInstance = component.getJSONObject("instance");
@@ -67,25 +66,40 @@ public class SyrImage implements SyrBaseModule, SyrComponent {
                 SyrStyler.styleView(imageView, style);
 
                 if (style.has("left")) {
-                    imageView.setX(style.getInt("left"));
+                    imageView.setX(BigDecimal.valueOf(style.getDouble("left")).floatValue());
                 }
 
                 if (style.has("top")) {
-                    imageView.setY(style.getInt("top"));
+                    imageView.setY(BigDecimal.valueOf(style.getDouble("top")).floatValue());
                 }
             }
-
             if (jsonProps.has("source")) {
+
                 // grabs the source url if present
                 source = jsonProps.getJSONObject("source");
                 String path = source.getString("uri");
 
                 // check if image exists in Resources
-                int pathExists = context.getResources().getIdentifier(path, "drawable", context.getPackageName());
-
+                final int pathExists = context.getResources().getIdentifier(path, "drawable", context.getPackageName());
+//
                 if (pathExists != 0) {
-                    // if exist set image
-                    imageView.setImageResource(pathExists);
+                    final ImageView iv = imageView;
+                    new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            // if exist set image
+                            new Handler(Looper.getMainLooper()).post(new Runnable() {
+                                @Override
+                                public void run() {
+                                    iv.setImageResource(pathExists);
+
+                                }
+
+                            });
+                        }
+                    }).start();
+//                    imageView.setImageResource(pathExists);
+
                 } else {
                     //Assume that its a url for now and try to fetch it in a background task
                     new DownloadImageTask(imageView, style).execute(path);
@@ -96,10 +110,10 @@ public class SyrImage implements SyrBaseModule, SyrComponent {
                 // throw red box because missing source prop entirely
             }
 
+
         } catch (JSONException e) {
             e.printStackTrace();
         }
-
 
         return imageView;
     }
@@ -141,8 +155,10 @@ public class SyrImage implements SyrBaseModule, SyrComponent {
                     final Paint paint = new Paint();
                     final Rect rect = new Rect(0, 0, bitmap.getWidth(), bitmap.getHeight());
                     final RectF rectF = new RectF(rect);
-                    final float roundPx = style.getInt("borderRadius");
-
+                    float roundPx = 0;
+                    if (style.has("borderRadius")) {
+                        roundPx = BigDecimal.valueOf(style.getDouble("borderRadius")).floatValue();
+                    }
                     paint.setAntiAlias(true);
                     canvas.drawARGB(0, 0, 0, 0);
                     paint.setColor(color);

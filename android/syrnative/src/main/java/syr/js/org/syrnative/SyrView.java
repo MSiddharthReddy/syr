@@ -1,12 +1,13 @@
 package syr.js.org.syrnative;
 
 import android.content.Context;
-import android.util.Log;
 import android.view.View;
 import android.widget.RelativeLayout;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.math.BigDecimal;
 
 /**
  * Syr Project
@@ -33,7 +34,6 @@ public class SyrView implements SyrBaseModule, SyrComponent {
                 style = componentInstance.getJSONObject("style");
                 if (instance == null) {
                     layout.setLayoutParams(SyrStyler.styleLayout(style));
-
                 } else {
 
                     if (style.has("width")) {
@@ -50,16 +50,17 @@ public class SyrView implements SyrBaseModule, SyrComponent {
 
                 }
                 if (style.has("left")) {
-                    layout.setX(style.getInt("left"));
+                    layout.setX(BigDecimal.valueOf(style.getDouble("left")).floatValue());
                 }
 
                 if (style.has("top")) {
-                    layout.setY(style.getInt("top"));
+                    layout.setY(BigDecimal.valueOf(style.getDouble("top")).floatValue());
                 }
 
                 if (style.has("opacity")) {
-                    layout.setAlpha(style.getInt("opacity"));
+                    layout.setAlpha(BigDecimal.valueOf(style.getDouble("opacity")).floatValue());
                 }
+
                 SyrStyler.styleView(layout, style);
 
 
@@ -77,7 +78,6 @@ public class SyrView implements SyrBaseModule, SyrComponent {
         } catch (JSONException e) {
             e.printStackTrace();
         }
-
         return layout;
     }
 
@@ -86,13 +86,4 @@ public class SyrView implements SyrBaseModule, SyrComponent {
         return "View";
     }
 
-    @SyrMethod
-    // java.lang.String , int
-
-    // {NativeModules} from 'syr'
-    // NativeModules.SyrView.testExportMethod('foo', 100);
-    public void testExportMethod(String message, int duration) {
-        message = message + "  " + this.getClass().getName();
-        Log.i(message, message);
-    }
 }

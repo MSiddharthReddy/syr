@@ -5,10 +5,7 @@ import android.animation.AnimatorListenerAdapter;
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
-import android.graphics.Canvas;
 import android.os.Handler;
-import android.os.Looper;
-import android.util.Log;
 import android.view.View;
 import android.view.animation.AccelerateDecelerateInterpolator;
 import android.view.animation.LinearInterpolator;
@@ -26,7 +23,7 @@ import java.util.HashMap;
 public class SyrAnimator {
     // todo: width and height
     // do we need two of these? borrow this from the raster?
-    static private Handler animationHandler = new Handler(Looper.getMainLooper());
+//    static private Handler animationHandler = new Handler(Looper.getMainLooper());
     static private HashMap<View, ObjectAnimator> animationCache = new HashMap<>();
 
     static private String determineAnimationType(JSONObject animationDict) {
@@ -37,7 +34,7 @@ public class SyrAnimator {
     }
 
     // animate a view
-    static void animate(final View component, final JSONObject jsonAnimation, final SyrBridge bridge) throws JSONException {
+    static void animate(final View component, final JSONObject jsonAnimation, final SyrBridge bridge, final Handler animationHandler) throws JSONException {
         final String guid = jsonAnimation.getString("guid");
         final JSONObject animationDict = jsonAnimation.getJSONObject("animation");
         String animationType = determineAnimationType(animationDict);
