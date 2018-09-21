@@ -1,4 +1,4 @@
-# 1.5.2 release
+# syr js - development version
 
 <div align="center">
   <img src="https://github.com/syrjs/core/blob/master/logos/syr-logo.png" alt="syr" title="syr" width=128>
@@ -73,11 +73,35 @@ https://github.com/syrjs/syr/milestones
 
 ### Running the local Sample
 
+First steps:
+
 * Clone the repo
 * `npm install`
 * `npm run serve`
+
+To run on iOS simulator:
+
 *  Open [ios/SyrNativeSample](https://github.com/dmikey/syr/tree/master/ios/SyrNativeSample/SyrNativeSample.xcodeproj) in xcode
 *  Run the project in xcode.
+
+To run on Android emulator, using Gradle:
+
+* `cd android && ./gradlew installDebug`
+* run the app on the Android emulator
+
+To run the calculator sample (partially working), make the following change to `webpack.config.js` before `npm run serve`:
+
+```diff
+diff --git a/webpack.config.js b/webpack.config.js
+index 7361b24..33b9561 100644
+--- a/webpack.config.js
++++ b/webpack.config.js
+@@ -7,3 +7,3 @@ module.exports = {
+   entry: {
+-    app: ['./samples/example.js']
++    app: ['./samples/calculator.js']
+   },
+```
 
 ## Contributors
 <div align="center">
