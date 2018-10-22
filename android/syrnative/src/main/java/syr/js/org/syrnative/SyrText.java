@@ -96,6 +96,7 @@ public class SyrText implements SyrBaseModule, SyrComponent {
                     }
                 }
                 if (style.has("maxLines")) {
+                    textView.setSingleLine(false);
                     textView.setLines(style.getInt("maxLines"));
                 } else {
                     textView.setSingleLine(true);
